@@ -24,7 +24,7 @@ enum MenuModel {
             self.getGames = getGames
         }
     }
-        
+    
     class MenuTableViewDataSource: TableViewDataSource {
         
         init(dataModel: DataModel) {
@@ -63,9 +63,12 @@ enum MenuModel {
                     for competition in competitions {
                         if let events = competition.events {
                             for event in events {
+                                
                                 let gameCellData = GamesTableViewCellData.init(competitor1Caption: event.additionalCaptions?.competitor1,
                                                                                competitor2Caption: event.additionalCaptions?.competitor2,
-                                                                               elapsedTime: event.liveData?.elapsed)
+                                                                               elapsedTime: event.liveData?.elapsedTimeDate,
+                                                                               betItems: event.markets?.first?.betItems)
+                                
                                 cellData.append(gameCellData)
                             }
                         }
@@ -74,6 +77,7 @@ enum MenuModel {
                 
                 let gamesSectionData = TableViewDataSource.SectionData.init(sectionId: betView.betViewKey,
                                                                             sectionTitle: betView.competitionContextCaption,
+                                                                            sectionType: .games,
                                                                             cellData: cellData)
                 sectionData.append(gamesSectionData)
             }
@@ -98,6 +102,7 @@ enum MenuModel {
                 
                 let headlineSectionData = TableViewDataSource.SectionData.init(sectionId: headlineDM.marketViewKey,
                                                                                sectionTitle: nil,
+                                                                               sectionType: .headlines,
                                                                                cellData: [headLinesTableViewCellData])
                 
                 

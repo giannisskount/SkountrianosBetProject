@@ -65,10 +65,8 @@ class LoginViewModel {
     
     func performLogin() {
         
-        print("Login with username: \(self.loginModel.username) & password: \(self.loginModel.password)")
-        
         isLoading = true
-        LoginNetworkService.loginCall { [weak self] response, error in
+        LoginNetworkService.loginCall(username: self.loginModel.username, password: self.loginModel.password, completion: { [weak self] response, error in
             
             self?.isLoading = false
             if let bearerToken = response?.accessToken {
@@ -76,7 +74,6 @@ class LoginViewModel {
             } else {
                 self?.credentialsValidationResult.send(.failure)
             }
-        }
+        })
     }
-    
 }

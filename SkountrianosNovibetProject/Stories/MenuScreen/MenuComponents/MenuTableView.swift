@@ -44,7 +44,7 @@ class MenuTableView: UITableView {
     
     @objc private func hideSection(sender: UIButton) {
         
-        let section = sender.tag// Create section let
+        let section = sender.tag
         
         guard let thisDependencies = dependencies else {
             return
@@ -61,7 +61,42 @@ class MenuTableView: UITableView {
         }
     }
     
+    func getIndexPath(uniqueIdentifier: String) -> IndexPath? {
+        
+        guard let thisDependencies = dependencies else {
+            return nil
+        }
+        
+        for section in 0..<thisDependencies.sectionData.count {
+            for row in 0..<thisDependencies.sectionData[section].cellData.count {
+                if thisDependencies.sectionData[section].cellData[row].uniqueIdentifier == uniqueIdentifier {
+                    return IndexPath.init(row: row, section: section)
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    func getSections(sectionType: TableViewDataSource.SectionData.SectionType) -> [Int]? {
+        
+        guard let thisDependencies = dependencies else {
+            return nil
+        }
+        
+        var sections = [Int]()
+        
+        for section in 0..<thisDependencies.sectionData.count {
+            if thisDependencies.sectionData[section].sectionType == sectionType {
+                sections.append(section)
+            }
+        }
+        
+        return sections
+    }
+    
     func indexPathsForSection(section: Int) -> [IndexPath] {
+        
         var indexPaths = [IndexPath]()
         
         guard let thisDependencies = dependencies else {

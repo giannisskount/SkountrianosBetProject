@@ -9,18 +9,6 @@ import UIKit
 
 final class LoginView: UIView {
 
-    lazy var logoImageView: UIImageView = {
-        
-        let logoImageView = UIImageView.init()
-        
-        logoImageView.heightAnchor.constraint(equalToConstant: 70.0).isActive = true
-        logoImageView.widthAnchor.constraint(equalToConstant: 70.0).isActive = true
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.image = UIImage(named: "logo")
-        
-        return logoImageView
-    }()
-    
     lazy var loginTextField: UITextField = {
         
         let usernameTextField = UITextField()
@@ -56,8 +44,7 @@ final class LoginView: UIView {
         return passwordTextField
     }()
     
-    lazy var loginButton = CustomButton()
-
+    lazy var loginButton = LoginButton()
     lazy var activityIndicator = UIActivityIndicatorView.init(style: .medium)
 
     var isLoading: Bool = false {

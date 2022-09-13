@@ -6,21 +6,25 @@
 //
 
 import Foundation
+import Combine
+
+enum MenuInitializeResult {
+    case success
+    case failure
+}
 
 class MenuViewModel {
-        
+    
     private var menuNetworkService: MenuNetworkService
-
-    var headlinesDM: [HeadLineDM]?
-    var getGame: [GetGame]?
-        
-    var dataModel =  MenuModel.DataModel()
+    var dataModel = MenuModel.DataModel()
+    
+    let initializeValidationResult = PassthroughSubject<MenuInitializeResult, Never>()
     
     init(bearerToken: String) {
         self.menuNetworkService = MenuNetworkService.init(bearerToken: bearerToken)
     }
     
-    func initializeData(completion: @escaping () -> Void) {
+    func initializeData() {
         
         let dispatchGroup = DispatchGroup.init()
         
@@ -35,7 +39,7 @@ class MenuViewModel {
         }
         
         dispatchGroup.notify(queue: .main) {
-            completion()
+            self.initializeValidationResult.send(.success)
         }
     }
     
@@ -44,15 +48,15 @@ class MenuViewModel {
         self.menuNetworkService.getHeadlines { [weak self] response, error in
             
             if let thisResponse = response {
-                self?.headlinesDM = thisResponse.map(HeadLineDM.init)
+                self?.dataModel.updateData(headlinesDM: thisResponse.map(HeadLineDM.init))
             }
-            self?.dataModel.updateData(headlinesDM: self?.headlinesDM)
             completion()
         }
     }
     
     func initializeGetGames(completion: @escaping () -> Void) {
         self.menuNetworkService.getGames { [weak self] response, error in
+            
             DispatchQueue.main.async {
                 self?.dataModel.updateData(getGames: response)
             }
@@ -62,19 +66,19 @@ class MenuViewModel {
     
     func updateHeadlines(completion: @escaping () -> Void) {
         self.menuNetworkService.updateHeadlines { [weak self] response, error in
+            
             DispatchQueue.main.async {
                 if let thisResponse = response {
-                    self?.headlinesDM = thisResponse.map(HeadLineDM.init)
+                    self?.dataModel.updateData(headlinesDM: thisResponse.map(HeadLineDM.init))
                 }
-                self?.dataModel.updateData(headlinesDM: self?.headlinesDM)
                 completion()
             }
-            
         }
     }
     
     func updateGame(completion: @escaping () -> Void) {
         self.menuNetworkService.updateGames { [weak self] response, error in
+            
             DispatchQueue.main.async {
                 self?.dataModel.updateData(getGames: response)
                 completion()

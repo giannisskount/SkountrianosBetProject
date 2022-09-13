@@ -13,7 +13,7 @@ class LoginViewController: UIViewController {
     var stackView: UIStackView?
     var userNameTextfield: UITextField?
     var passwordTextfield: UITextField?
-    var loginButton: CustomButton?
+    var loginButton: LoginButton?
     
     private lazy var contentView = LoginView()
     private var viewModel: LoginViewModel = LoginViewModel()
@@ -28,6 +28,7 @@ class LoginViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         self.view.backgroundColor = .black
+        self.navigationController?.navigationBar.isHidden = true
         
         self.setupGestures()
         self.setupActions()
@@ -110,66 +111,5 @@ extension LoginViewController: UITextFieldDelegate {
         
         textField.resignFirstResponder()
         return true
-    }
-}
-
-class CustomButton: UIButton {
-    
-    override var isEnabled: Bool {
-        didSet {
-            self.isHidden = !isEnabled
-        }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupButton()
-    }
-    
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupButton()
-    }
-    
-    
-    func setupButton() {
-        setShadow()
-        
-        setTitleColor(.white, for: .normal)
-        setTitle("Login", for: .normal)
-        backgroundColor      = BetColor.primaryColor
-        layer.cornerRadius   = 25
-        layer.borderWidth    = 3.0
-        layer.borderColor    = UIColor.darkGray.cgColor
-    }
-    
-    
-    private func setShadow() {
-        layer.shadowColor   = UIColor.white.cgColor
-        layer.shadowOffset  = CGSize(width: 0.0, height: 6.0)
-        layer.shadowRadius  = 8
-        layer.shadowOpacity = 0.5
-        clipsToBounds       = true
-        layer.masksToBounds = false
-    }
-    
-    
-    func shake() {
-        let shake           = CABasicAnimation(keyPath: "position")
-        shake.duration      = 0.1
-        shake.repeatCount   = 2
-        shake.autoreverses  = true
-        
-        let fromPoint       = CGPoint(x: center.x - 8, y: center.y)
-        let fromValue       = NSValue(cgPoint: fromPoint)
-        
-        let toPoint         = CGPoint(x: center.x + 8, y: center.y)
-        let toValue         = NSValue(cgPoint: toPoint)
-        
-        shake.fromValue     = fromValue
-        shake.toValue       = toValue
-        
-        layer.add(shake, forKey: "position")
     }
 }

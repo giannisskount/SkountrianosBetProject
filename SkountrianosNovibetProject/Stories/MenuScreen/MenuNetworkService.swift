@@ -96,37 +96,20 @@ class MenuNetworkService {
 
 class LoginNetworkService {
     
-    static let loginURL = "https://www.mocky.io/v2/5d8e4bd9310000a2612b5448"
+    static let LOGIN_URL = "https://www.mocky.io/v2/5d8e4bd9310000a2612b5448"
     
-    static func loginCall(completion: @escaping (LoginResponse?, BetError?) -> Void) {
+    static func loginCall(username: String, password: String, completion: @escaping (LoginResponse?, BetError?) -> Void) {
         
-        let url = URL(string: "https://www.mocky.io/v2/5d8e4bd9310000a2612b5448")!
-        let params = LoginRequest.init(userName: "test", password: "test2")
-        var request = URLRequest.init(url: url)
-        
-        if let data = try? JSONEncoder().encode(params) {
-            // The JSON data is in bytes. Let's printit as a JSON string.
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print(jsonString)
-            }
-            request.httpBody = data
-        }
-        request.httpMethod = "POST"
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data {
-                if let loginResponse = try? JSONDecoder().decode(LoginResponse.self, from: data) {
-                    completion(loginResponse, nil)
-                } else {
-                    print("Invalid Response")
-                    completion(nil, BetError.unknown)
-                }
-            } else if let error = error {
-                print("HTTP Request Failed \(error)")
+        NetworkClient.executeRequest(url: Self.LOGIN_URL,
+                                     httpMethod: .post,
+                                     responseType: LoginResponse.self) { response in
+            
+            if let response = response  {
+                completion(response, nil)
+                
+            } else {
                 completion(nil, BetError.unknown)
             }
         }
-        
-        task.resume()
     }
 }

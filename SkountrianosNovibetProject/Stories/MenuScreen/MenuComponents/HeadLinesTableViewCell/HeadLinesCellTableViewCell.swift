@@ -24,25 +24,16 @@ class HeadLinesCellTableViewCellData: TableViewDataSource.CellData {
 class HeadLinesCellTableViewCell: TableViewCell {
 
     @IBOutlet weak var collectionView: PagingCollectionView!
-        
-    var scrollTimer: Timer?
-    
+            
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        self.collectionView.backgroundColor = .clear
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        self.scrollTimer = nil
     }
     
     override func setData(cellData: TableViewDataSource.CellData?) {
@@ -52,26 +43,9 @@ class HeadLinesCellTableViewCell: TableViewCell {
         }
         
         self.collectionView.dependencies = cellData.data
-        
-        if self.scrollTimer != nil {
-            self.scrollTimer?.invalidate()
-            self.scrollTimer = nil
-        } else {
-            self.startTimer()
-        }
-    }
-    
-    func startTimer() {
-
-        let timer = Timer(timeInterval: 5, repeats: true) { [weak self] _ in
-            self?.scrollAutomatically()
-        }
-        RunLoop.current.add(timer, forMode: .common)
-        self.scrollTimer = timer
     }
 
-
-    func scrollAutomatically() {
+    func scroll() {
 
         guard let collectionView = self.collectionView else {
             return

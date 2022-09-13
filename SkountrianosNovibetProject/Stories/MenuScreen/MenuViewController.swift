@@ -6,14 +6,14 @@
 //
 
 import UIKit
+import Combine
 
 class MenuViewController: UIViewController {
     
     private lazy var contentView = MenuView()
     private var viewModel: MenuViewModel
-    
-    var tableTimer: Timer?
-    
+    private var subscriptions = Set<AnyCancellable>()
+        
     init(viewModel: MenuViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -32,39 +32,81 @@ class MenuViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         self.view.backgroundColor = .clear
+        self.setupSubscriptions()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        print("MenuViewController - viewDidAppear(:)")
-        self.viewModel.initializeData {
+        self.viewModel.initializeData()
+    }
+        
+    private func setupSubscriptions() {
+        
+        self.viewModel.initializeValidationResult
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] validationResult in
+                switch validationResult {
+                case .success:
+                    self.handleSuccessfullInitializeData()
+                case .failure:
+                    // Needs implementation when we handle errors from response
+                    print("MenuViewController - initializeValidationResult: failure(:)")
+                }
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func handleSuccessfullInitializeData() {
+        
+        self.update()
+        self.setupTimerSubscriptions()
+    }
+    
+    func setupTimerSubscriptions() {
+        
+        Timer.publish(every: 5.0, on: .main, in: .default)
+            .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] _ in
+                self.contentView.scrollHeadlines()
+            }
+            .store(in: &subscriptions)
+        
+        Timer.publish(every: 1.0, on: .main, in: .default)
+            .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] _ in
+                self.contentView.updateElapsedTime()
+            }
+            .store(in: &subscriptions)
+        
+        Timer.publish(every: 10.0, on: .main, in: .default)
+            .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] _ in
+                self.fetchHeadlines()
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func fetchHeadlines() {
+        
+        self.viewModel.updateHeadlines {
             self.update()
-            self.startTableUpdates()
         }
     }
     
-    deinit {
-        tableTimer?.invalidate()
-        tableTimer = nil
-    }
-    
-    func startTableUpdates() {
-        tableTimer = Timer.scheduledTimer(timeInterval: 9, target: self, selector: #selector(self.updateTableData), userInfo: nil, repeats: true)
+    private func fetchGames() {
+        
+        self.viewModel.updateGame {
+            self.update()
+        }
     }
     
     func update() {
         
         let tableViewDatasource = MenuModel.MenuTableViewDataSource.init(dataModel: self.viewModel.dataModel)
         self.contentView.update(dataSource: tableViewDatasource)
-    }
-    
-    @objc func updateTableData() {
-        self.viewModel.updateHeadlines {
-            self.update()
-        }
-        self.viewModel.updateGame {
-            self.update()
-        }
     }
 }

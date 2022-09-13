@@ -5,11 +5,6 @@
 //  Created by Ιωάννης Σκουντριάνος on 10/9/22.
 //
 
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse the JSON, add this file to your project and do:
-//
-//   let headLineResponse = try? newJSONDecoder().decode(HeadLineResponse.self, from: jsonData)
-
 import Foundation
 
 // MARK: - HeadLineResponse
